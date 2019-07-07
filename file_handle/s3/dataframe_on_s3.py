@@ -8,7 +8,8 @@ CRED = pd.read_csv(CREDENTIAL_FILE, encoding='cp932', dtype=object, index_col='U
 S3_KEY = CRED['Access key ID'][USER_NAME]
 S3_SECRET = CRED['Secret access key'][USER_NAME]
 
-REPOSITORY_PATH = '<file path in S3>'
+BUCKET = '<bucket name>'
+BUCKET_KEY = '<path to file in a bucket>'
 FILE_NAME = '<file name>'
 
 
@@ -20,17 +21,31 @@ def write_df_to_s3(df, s3_path):
         f.write(bytes_to_write)
 
 
-def read_df_from_s3(s3_path, encoding='utf8', dtype=object):
+def find_files_in_s3(s3_path, full_path=False):
+    """
+        no need 's3://' for s3_path
+    """
+    fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
+
+    files = [f for f in fs.ls(s3_path, refresh=True)]
+
+    if not full_path:
+        files = [re.split('/', f)[-1] for f in files]
+
+    return files
+
+
+def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MINIMAL, delimiter=','):
     fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
 
     with fs.open(s3_path) as f:
-        df = pd.read_csv(f, encoding=encoding, dtype=dtype)
+        df = pd.read_csv(f, encoding=encoding, dtype=dtype, quoting=quoting, delimiter=delimiter)
         return df
 
 
 def test():
     data = pd.DataFrame()
-    s3_path = '/'.join(['s3:/', REPOSITORY_PATH, FILE_NAME])
+    s3_path = '/'.join(['s3:/', BUCKET, BUCKET_KEY, FILE_NAME])
     write_df_to_s3(data, s3_path)
 
 
