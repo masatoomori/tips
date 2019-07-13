@@ -1,5 +1,8 @@
 import pandas as pd
 import s3fs
+import boto3
+import io
+import re
 
 # S3へのアクセス
 CREDENTIAL_FILE = 'credentials.csv'
@@ -19,6 +22,16 @@ def write_df_to_s3(df, s3_path):
 
     with fs.open(s3_path, 'wb') as f:
         f.write(bytes_to_write)
+
+
+def s3_key_exists(s3_path):
+    fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
+
+    try:
+        fs.ls(s3_path, refresh=True)
+        return fs.exists(s3_path)
+    except FileNotFoundError:
+        return False
 
 
 def find_files_in_s3(s3_path, full_path=False):
@@ -41,6 +54,15 @@ def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MI
     with fs.open(s3_path) as f:
         df = pd.read_csv(f, encoding=encoding, dtype=dtype, quoting=quoting, delimiter=delimiter)
         return df
+
+
+def read_df_from_s3_by_lambda(event, context):
+    client = boto3.client('s3')
+    key = event['Records'][0]['s3']['object']['key']
+    obj = client.get_object(Bucket=BUCKET, Key=key)
+    df = pd.read_csv(io.BytesIO(obj['Body'].read()))
+
+    return df
 
 
 def test():
