@@ -23,6 +23,7 @@ def main():
                                                                                f=CONFIG['function'],
                                                                                z=BUILD_FILE)
     os.system(aws_cmd)
+    os.system("rm {}".format(BUILD_FILE))
 
 
 if __name__ == '__main__':

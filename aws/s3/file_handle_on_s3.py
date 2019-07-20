@@ -3,6 +3,7 @@ import s3fs
 import boto3
 import io
 import re
+import csv
 
 # S3へのアクセス
 CREDENTIAL_FILE = 'credentials.csv'
@@ -31,6 +32,16 @@ def s3_key_exists(s3_path):
         fs.ls(s3_path, refresh=True)
         return fs.exists(s3_path)
     except FileNotFoundError:
+        return False
+
+
+def rm_s3_key(s3_path):
+    fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
+
+    if s3_key_exists(s3_path):
+        fs.rm(s3_path)
+        return True
+    else:
         return False
 
 
