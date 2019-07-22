@@ -17,8 +17,8 @@ BUCKET_KEY = '<path to file in a bucket>'
 FILE_NAME = '<file name>'
 
 
-def write_df_to_s3(df, s3_path):
-    bytes_to_write = df.to_csv(None, index=False).encode()
+def write_df_to_s3(df, s3_path, sep=','):
+    bytes_to_write = df.to_csv(None, sep=sep, index=False).encode()
     fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
 
     with fs.open(s3_path, 'wb') as f:
