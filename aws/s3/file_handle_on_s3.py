@@ -67,11 +67,12 @@ def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MI
         return df
 
 
-def read_df_from_s3_by_lambda(event, context):
+def read_df_from_s3_in_lambda(bucket, key, event=None, encoding='utf8', dtype=object, delimiter=','):
     client = boto3.client('s3')
-    key = event['Records'][0]['s3']['object']['key']
-    obj = client.get_object(Bucket=BUCKET, Key=key)
-    df = pd.read_csv(io.BytesIO(obj['Body'].read()))
+    if event is not None:
+        key = event['Records'][0]['s3']['object']['key']
+    obj = client.get_object(Bucket=bucket, Key=key)
+    df = pd.read_csv(io.BytesIO(obj['Body'].read()), encoding=encoding, dtype=dtype, delimiter=delimiter)
 
     return df
 
