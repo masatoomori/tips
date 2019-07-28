@@ -8,3 +8,12 @@ print(str_with_iso_format_date, m.group('year'))
 print(str_with_iso_format_date, m.group('month'))
 print(str_with_iso_format_date, m.group('day'))
 ```
+
+
+### 改行、タブを削除しtsv形式で保存できるようにする
+```python
+def strip(x):
+    x = str(x).replace('\n', '').replace('\r', '').replace('\t', ' ')
+
+    return x
+```

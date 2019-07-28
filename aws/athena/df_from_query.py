@@ -37,7 +37,7 @@ def main():
     athena = boto3.client('athena', region_name=DATABASE_REGION)
     sql = '<SQL Query>'
 
-    result = athena.start_query_execution(
+    response = athena.start_query_execution(
         QueryString=sql,
         QueryExecutionContext={
             'Database': DATABASE_NAME
@@ -48,7 +48,7 @@ def main():
     )
 
     """
-    result = {
+    response = {
         'QueryExecutionId': 'xxx',
         'ResponseMetadata': {
             'HTTPHeaders': {
@@ -65,7 +65,16 @@ def main():
     }
     """
 
-    result_file_key = '/'.join([OUTPUT_BUCKET, result['QueryExecutionId'] + '.csv'])
+    # ステータスがSUCCEEDEDかFAILEDになるまで待つ
+    status = 'RUNNING'
+    exec_id = response['QueryExecutionId']
+    while status not in ('SUCCEEDED', 'FAILED'):
+        try:
+            status = athena.get_query_execution(QueryExecutionId=exec_id)['QueryExecution']['Status']['State']
+        except Exception as e:
+            print(e)
+
+    result_file_key = '/'.join([OUTPUT_BUCKET, response['QueryExecutionId'] + '.csv'])
     df = read_df_from_s3(result_file_key)
 
     print(df.describe())
