@@ -35,10 +35,10 @@ def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MI
 
 def main():
     athena = boto3.client('athena', region_name=DATABASE_REGION)
-    sql = '<SQL Query>'
+    query = '<SQL Query>'
 
     response = athena.start_query_execution(
-        QueryString=sql,
+        QueryString=query,
         QueryExecutionContext={
             'Database': DATABASE_NAME
         },
@@ -74,8 +74,8 @@ def main():
         except Exception as e:
             print(e)
 
-    result_file_key = '/'.join([OUTPUT_BUCKET, response['QueryExecutionId'] + '.csv'])
-    df = read_df_from_s3(result_file_key)
+    response_key = '/'.join([OUTPUT_BUCKET, response['QueryExecutionId'] + '.csv'])
+    df = read_df_from_s3(response_key)
 
     print(df.describe())
 
