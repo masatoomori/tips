@@ -15,3 +15,10 @@ string1 || string2
 UPPER(string1)
 LOWER(string2)
 ```
+
+## 代入
+### NULLを埋める
+2つ以上の引数を取り、一番最初のNULLでない値を返す
+```sql
+COALESCE(a, b)
+```
