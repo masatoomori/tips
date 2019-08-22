@@ -4,6 +4,7 @@ import datetime
 import io
 import pandas as pd
 from io import StringIO
+import re
 
 DEFAULT_TIMEOUT_IN_SEC = 300
 DEFAULT_WAIT_IN_SEC = 1
@@ -124,11 +125,17 @@ class SingleResult:
                 self.__delete_log(response_key + '.txt')
             else:
                 self.response_keys.append(response_key + '.csv/txt')
+
+            view_name = re.split(' ', re.split('\n', query)[0])[-2]
+
+            return view_name
+
         else:
             print('query should starts with "CREATE OR REPLACE VIEW" or "CREATE VIEW"')
             print('----------------------------------------')
             print(query)
             print('----------------------------------------')
+            return None
 
     def download_table(self, query, keep_result=True):
         if query.upper().startswith('SELECT'):

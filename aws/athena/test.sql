@@ -1,4 +1,4 @@
-create view test_view as
+create or replace view test_view as
 select
     *
 from
