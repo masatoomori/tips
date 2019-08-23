@@ -14,6 +14,7 @@ class SingleResult:
     timeout_in_sec = DEFAULT_TIMEOUT_IN_SEC
     wait_in_sec = DEFAULT_WAIT_IN_SEC
     response_keys = list()
+    query_for_view_creation = None
     df_result = pd.DataFrame()
 
     def __init__(self, db_region, db_name, bucket, prefix):
@@ -45,6 +46,9 @@ class SingleResult:
 
     def get_table(self):
         return self.df_result
+
+    def get_query(self):
+        return self.query_for_view_creation
 
     def __wait_for_execution_done(self, response):
         # ステータスがSUCCEEDEDかFAILEDになるまで待つ
@@ -105,6 +109,7 @@ class SingleResult:
     def create_view(self, query, delete_log=True):
         if query.upper().startswith('CREATE OR REPLACE VIEW') or query.upper().startswith('CREATE VIEW'):
             output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
+            self.query_for_view_creation = query
 
             response = self.athena.start_query_execution(
                 QueryString=query,
@@ -176,6 +181,14 @@ class SingleResult:
 
     def download_view(self, query, keep_result=True):
         return self.download_table(query, keep_result)
+
+    def download_table_all(self, table, keep_result=True):
+        query = 'select * from {}'.format(table)
+        self.download_table(query, keep_result)
+
+    def download_view_all(self, view, keep_result=True):
+        query = 'select * from {}'.format(view)
+        self.download_view(query, keep_result)
 
     def save_table(self, dst_bucket, dst_key):
         s3 = boto3.resource('s3')
