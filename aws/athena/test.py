@@ -1,15 +1,10 @@
 from Athena import SingleResult
 
 
-# DATABASE_REGION = '<aws region>'
-# DATABASE_NAME = '<database name in glue>'
-# ATHENA_BUCKET = '<bucket to store athena result / log>'
-# ATHENA_BUCKET_PREFIX = 'prefix to store athena result / log'
-
-DATABASE_REGION = 'ap-northeast-1'
-DATABASE_NAME = 'cbre-data-lake-glue'
-ATHENA_BUCKET = 'cbre-data-lake'
-ATHENA_BUCKET_PREFIX = 'athena/tmp'
+DATABASE_REGION = '<aws region>'
+DATABASE_NAME = '<database name in glue>'
+ATHENA_BUCKET = '<bucket to store athena result / log>'
+ATHENA_BUCKET_PREFIX = 'prefix to store athena result / log'
 
 
 def load_query(f):
@@ -34,7 +29,7 @@ def main():
 
     print(df)
 
-    athena.save_result(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
+    athena.save_table(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
 
 
 if __name__ == '__main__':

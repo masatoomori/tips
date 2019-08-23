@@ -175,9 +175,9 @@ class SingleResult:
             return pd.DataFrame
 
     def download_view(self, query, keep_result=True):
-        self.download_table(query, keep_result)
+        return self.download_table(query, keep_result)
 
-    def save_result(self, dst_bucket, dst_key):
+    def save_table(self, dst_bucket, dst_key):
         s3 = boto3.resource('s3')
 
         csv_buffer = StringIO()
@@ -195,3 +195,7 @@ class SingleResult:
                 time_elapsed = (datetime.datetime.now() - start_time).seconds
 
         self.response_keys.append('/'.join([dst_bucket, dst_key]))
+        return res
+
+    def save_view(self, dst_bucket, dst_key):
+        return self.save_table(dst_bucket, dst_key)
