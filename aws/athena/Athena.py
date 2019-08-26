@@ -15,6 +15,7 @@ class SingleResult:
     wait_in_sec = DEFAULT_WAIT_IN_SEC
     response_keys = list()
     query_for_view_creation = None
+    last_query = None
     df_result = pd.DataFrame()
 
     def __init__(self, db_region, db_name, bucket, prefix):
@@ -47,26 +48,30 @@ class SingleResult:
     def get_table(self):
         return self.df_result
 
-    def get_query(self):
-        return self.query_for_view_creation
+    def get_query(self, timing='last'):
+        if timing == 'view_creation':
+            return self.query_for_view_creation
+        return self.last_query
 
     def __wait_for_execution_done(self, response):
-        # ステータスがSUCCEEDEDかFAILEDになるまで待つ
-        status = 'RUNNING'
+        # ステータスステートがSUCCEEDEDかFAILEDになるまで待つ
         exec_id = response['QueryExecutionId']
 
         start_time = datetime.datetime.now()
         time_elapsed = (datetime.datetime.now() - start_time).seconds
         while time_elapsed < self.timeout_in_sec:
             try:
-                status = self.athena.get_query_execution(QueryExecutionId=exec_id)['QueryExecution']['Status']['State']
+                execution = self.athena.get_query_execution(QueryExecutionId=exec_id)['QueryExecution']
+                status_state = execution['Status']['State']
+                if status_state in ('SUCCEEDED', 'FAILED'):
+                    if status_state == 'FAILED':
+                        print(execution)
+                    break
+                print('{s}: time elapsed {t} sec'.format(s=status_state, t=time_elapsed))
             except Exception as e:
                 print(e)
-            if status in ('SUCCEEDED', 'FAILED'):
-                break
-            else:
-                time.sleep(self.wait_in_sec)
-                time_elapsed = (datetime.datetime.now() - start_time).seconds
+            time.sleep(self.wait_in_sec)
+            time_elapsed = (datetime.datetime.now() - start_time).seconds
 
     def __delete_log(self, response_key):
         s3 = boto3.resource('s3')
@@ -110,6 +115,7 @@ class SingleResult:
         if query.upper().startswith('CREATE OR REPLACE VIEW') or query.upper().startswith('CREATE VIEW'):
             output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
             self.query_for_view_creation = query
+            self.last_query = query
 
             response = self.athena.start_query_execution(
                 QueryString=query,
@@ -145,6 +151,7 @@ class SingleResult:
     def download_table(self, query, keep_result=True):
         if query.upper().startswith('SELECT'):
             output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
+            self.last_query = query
 
             response = self.athena.start_query_execution(
                 QueryString=query,
@@ -180,15 +187,18 @@ class SingleResult:
             return pd.DataFrame
 
     def download_view(self, query, keep_result=True):
+        self.last_query = query
         return self.download_table(query, keep_result)
 
     def download_table_all(self, table, keep_result=True):
         query = 'select * from {}'.format(table)
-        self.download_table(query, keep_result)
+        self.last_query = query
+        return self.download_table(query, keep_result)
 
     def download_view_all(self, view, keep_result=True):
         query = 'select * from {}'.format(view)
-        self.download_view(query, keep_result)
+        self.last_query = query
+        return self.download_view(query, keep_result)
 
     def save_table(self, dst_bucket, dst_key):
         s3 = boto3.resource('s3')
