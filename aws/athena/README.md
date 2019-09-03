@@ -3,6 +3,8 @@ AWS Athenaはカタログ化したS3データなどを簡単に組み合わせ�
 ただし、ブラウザからではなく、スクリプトの中で使おうとするといろいろと面倒な作業があるので、
 そのような作業をClassを作成し、まとめました。
 
+AWS Lambda Layerで使う場合、pythonディレクトリをzipしてアップロードします。
+
 現在は下記のClassがあります
 - SingleResult: VIEWの作成や、TABLE/VIEWのデータダウンロードを行います。内部にDataFrameとして結果を保持します。一度に保持できる結果は1つのみです
 
@@ -20,22 +22,34 @@ DATABASE_NAME = '<database name in glue>'
 ATHENA_BUCKET = '<bucket to store athena result / log>'
 ATHENA_BUCKET_PREFIX = 'prefix to store athena result / log'
 
-athena = SingleResult(DATABASE_REGION, DATABASE_NAME, ATHENA_BUCKET, ATHENA_BUCKET_PREFIX)
+atn = SingleResult(DATABASE_REGION, DATABASE_NAME, ATHENA_BUCKET, ATHENA_BUCKET_PREFIX)
+```
+
+クエリを読み込みます
+```python
+f = '<path to sql file>'
+query = atn.load_query_file(f)
 ```
 
 テキストのクエリを引数に取り、作成したVIEWの名前を返します
 ```python
-view = athena.create_view(query)
+view = atn.create_view(query)
 ```
 
 テキストのクエリを引数に取り、DataFrameに結果を格納します。一次結果ファイルを残すかどうか選択できます
 ```python
-df = athena.download_view('select * from test_view', keep_result=False)
+df = atn.read_sql('select * from test_view', keep_result=False)
+```
+
+クエリをファイルから読み込んでDataFrameに結果を格納します。
+```python
+f = '<path to sql file>'
+df = atn.read_sql_from_file(f, keep_result=False)
 ```
 
 S3のバケツとキーを指定して、CSV形式で結果を保存できます
 ```python
-athena.save_result(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
+atn.save_result(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
 ```
 
 # クエリ

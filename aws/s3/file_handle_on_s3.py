@@ -25,6 +25,14 @@ def write_df_to_s3(df, s3_path, sep=','):
         f.write(bytes_to_write)
 
 
+def write_df_to_s3_with_boto3(df, bucket, key, sep=','):
+    client = boto3.client('s3')
+    bytes_to_write = df.to_csv(None, sep=sep, index=False).encode()
+    response = client.put_object(Bucket=bucket, Key=key, Body=bytes_to_write)
+
+    return response
+
+
 def s3_key_exists(s3_path):
     fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
 
@@ -67,7 +75,7 @@ def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MI
         return df
 
 
-def read_df_from_s3_in_lambda(bucket, key, event=None, encoding='utf8', dtype=object, delimiter=','):
+def read_df_from_s3_with_boto3(bucket, key, event=None, encoding='utf8', dtype=object, delimiter=','):
     client = boto3.client('s3')
     if event is not None:
         key = event['Records'][0]['s3']['object']['key']

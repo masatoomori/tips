@@ -148,7 +148,72 @@ class SingleResult:
             print('----------------------------------------')
             return None
 
+    def read_sql(self, query, keep_result=True):
+        if query.upper().startswith('SELECT'):
+            output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
+            self.last_query = query
+
+            response = self.athena.start_query_execution(
+                QueryString=query,
+                QueryExecutionContext={
+                    'Database': self.db_name
+                },
+                ResultConfiguration={
+                    'OutputLocation': output_bucket_key
+                }
+            )
+
+            self.__wait_for_execution_done(response)
+
+            response_key = '/'.join([self.result_prefix, response['QueryExecutionId'] + '.csv'])
+
+            client = boto3.client('s3')
+            obj = client.get_object(Bucket=self.result_bucket, Key=response_key)
+
+            self.df_result = pd.read_csv(io.BytesIO(obj['Body'].read()), encoding='utf8', dtype=object)
+
+            if keep_result:
+                self.response_keys.append(response_key)
+                self.response_keys.append(response_key + '.metadata')
+            else:
+                self.__delete_result(response_key, and_metadata=True)
+
+            return self.df_result
+        else:
+            print('query should starts with "SELECT"')
+            print('----------------------------------------')
+            print(query)
+            print('----------------------------------------')
+            return pd.DataFrame
+
+    def read_key(self, bucket_key, encoding='utf8'):
+        client = boto3.client('s3')
+        obj = client.get_object(Bucket=self.result_bucket, Key=bucket_key)
+
+        self.df_result = pd.read_csv(io.BytesIO(obj['Body'].read()), encoding=encoding, dtype=object)
+
+        return self.df_result
+
+    def load_query_file(self, f, encoding='utf8'):
+        lines = open(f, encoding=encoding).readlines()
+
+        self.last_query = ''.join(lines)
+
+        return self.last_query
+
+    def create_view_from_file(self, f, encoding='utf8', delete_log=True):
+        query = self.load_query_file(f, encoding)
+
+        return self.create_view(query, delete_log)
+
+    def read_sql_from_file(self, f, encoding='utf8', keep_result=True):
+        query = self.load_query_file(f, encoding)
+
+        return self.read_sql(query, keep_result)
+
     def download_table(self, query, keep_result=True):
+        print('WARNING: {f} method will be merged do {t}in the future'.format(f='download_table()', t='read_sql()'))
+
         if query.upper().startswith('SELECT'):
             output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
             self.last_query = query
@@ -187,18 +252,19 @@ class SingleResult:
             return pd.DataFrame
 
     def download_view(self, query, keep_result=True):
+        print('WARNING: {f} method will be merged do {t}in the future'.format(f='download_view()', t='read_sql()'))
         self.last_query = query
         return self.download_table(query, keep_result)
 
     def download_table_all(self, table, keep_result=True):
         query = 'select * from {}'.format(table)
         self.last_query = query
-        return self.download_table(query, keep_result)
+        return self.read_sql(query, keep_result)
 
     def download_view_all(self, view, keep_result=True):
         query = 'select * from {}'.format(view)
         self.last_query = query
-        return self.download_view(query, keep_result)
+        return self.read_sql(query, keep_result)
 
     def save_table(self, dst_bucket, dst_key):
         s3 = boto3.resource('s3')
