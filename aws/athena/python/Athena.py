@@ -266,7 +266,7 @@ class SingleResult:
         self.last_query = query
         return self.read_sql(query, keep_result)
 
-    def save_table(self, dst_bucket, dst_key):
+    def save_result(self, dst_bucket, dst_key):
         s3 = boto3.resource('s3')
 
         csv_buffer = StringIO()
@@ -285,6 +285,3 @@ class SingleResult:
 
         self.response_keys.append('/'.join([dst_bucket, dst_key]))
         return res
-
-    def save_view(self, dst_bucket, dst_key):
-        return self.save_table(dst_bucket, dst_key)

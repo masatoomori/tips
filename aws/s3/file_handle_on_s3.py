@@ -1,6 +1,7 @@
 import pandas as pd
 import s3fs
 import boto3
+import botocore
 import io
 import re
 import csv
@@ -79,8 +80,13 @@ def read_df_from_s3_with_boto3(bucket, key, event=None, encoding='utf8', dtype=o
     client = boto3.client('s3')
     if event is not None:
         key = event['Records'][0]['s3']['object']['key']
-    obj = client.get_object(Bucket=bucket, Key=key)
-    df = pd.read_csv(io.BytesIO(obj['Body'].read()), encoding=encoding, dtype=dtype, delimiter=delimiter)
+
+    try:
+        obj = client.get_object(Bucket=bucket, Key=key)
+        df = pd.read_csv(io.BytesIO(obj['Body'].read()), encoding=encoding, dtype=dtype, delimiter=delimiter)
+    except botocore.exceptions.ClientError as e:
+        print(e)
+        df = pd.DataFrame()
 
     return df
 
