@@ -6,30 +6,20 @@ DATABASE_NAME = '<database name in glue>'
 ATHENA_BUCKET = '<bucket to store athena result / log>'
 ATHENA_BUCKET_PREFIX = 'prefix to store athena result / log'
 
+QUERY_FILE = 'test.sql'
 
-def load_query(f):
-    lines = open(f).readlines()
-
-    query = ''.join(lines)
-
-    return query
+QUERY = """SELECT
+*
+FROM {}
+""".format('<test table>')
 
 
 def main():
-    query = load_query('test.sql')
+    atn = SingleResult(DATABASE_REGION, DATABASE_NAME, ATHENA_BUCKET, ATHENA_BUCKET_PREFIX)
 
-    print(query)
+    df_1 = atn.read_sql_from_file(QUERY_FILE, keep_result=False)
+    df_2 = atn.read_sql(QUERY, keep_result=False)
 
-    athena = SingleResult(DATABASE_REGION, DATABASE_NAME, ATHENA_BUCKET, ATHENA_BUCKET_PREFIX)
-
-    view = athena.create_view(query)
-    print(view)
-
-    df = athena.download_view('select * from {}'.format(view), keep_result=False)
-
-    print(df)
-
-    athena.save_table(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
 
 
 if __name__ == '__main__':

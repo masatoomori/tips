@@ -54,7 +54,7 @@ class SingleResult:
         return self.last_query
 
     def __wait_for_execution_done(self, response):
-        # ステータスステートがSUCCEEDEDかFAILEDになるまで待つ
+        # Waiting for Status State to become SUCCEEDED or FAILED
         exec_id = response['QueryExecutionId']
 
         start_time = datetime.datetime.now()
@@ -212,7 +212,7 @@ class SingleResult:
         return self.read_sql(query, keep_result)
 
     def download_table(self, query, keep_result=True):
-        print('WARNING: {f} method will be merged do {t}in the future'.format(f='download_table()', t='read_sql()'))
+        print('WARNING: {f} method will be merged do {t} in the future'.format(f='download_table()', t='read_sql()'))
 
         if query.upper().startswith('SELECT'):
             output_bucket_key = 's3://{b}/{p}'.format(b=self.result_bucket, p=self.result_prefix)
@@ -252,7 +252,7 @@ class SingleResult:
             return pd.DataFrame
 
     def download_view(self, query, keep_result=True):
-        print('WARNING: {f} method will be merged do {t}in the future'.format(f='download_view()', t='read_sql()'))
+        print('WARNING: {f} method will be merged do {t} in the future'.format(f='download_view()', t='read_sql()'))
         self.last_query = query
         return self.download_table(query, keep_result)
 

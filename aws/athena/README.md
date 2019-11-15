@@ -60,6 +60,11 @@ atn.save_result(ATHENA_BUCKET, ATHENA_BUCKET_PREFIX + '/view_result.csv')
 created_iso_date > CURRENT_DATE - interval '1' month
 ```
 
+### Expiration_Dateが2018年1月1日以降
+```sql
+Expiration_Date >= CAST('2018-01-01' AS date)
+```
+
 ## 文字列
 ### 連結
 ```sql

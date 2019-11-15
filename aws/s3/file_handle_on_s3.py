@@ -34,6 +34,21 @@ def write_df_to_s3_with_boto3(df, bucket, key, sep=','):
     return response
 
 
+def write_matrix_to_s3(matrix, bucket, key, delimiter=','):
+    """
+    matrix = [[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]]
+    """
+    matrix = [delimiter.join([str(i) for i in line]) for line in matrix]
+
+    s3 = boto3.resource('s3')
+    obj = s3.Object(bucket, key)
+    response = obj.put(Body='\n'.join(matrix))
+
+    return response
+
+
 def s3_key_exists(s3_path):
     fs = s3fs.S3FileSystem(key=S3_KEY, secret=S3_SECRET)
 
@@ -79,6 +94,7 @@ def read_df_from_s3(s3_path, encoding='utf8', dtype=object, quoting=csv.QUOTE_MI
 def read_df_from_s3_with_boto3(bucket, key, event=None, encoding='utf8', dtype=object, delimiter=','):
     client = boto3.client('s3')
     if event is not None:
+        bucket = event['Records'][0]['s3']['bucket']['name']
         key = event['Records'][0]['s3']['object']['key']
 
     try:
