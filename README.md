@@ -10,5 +10,8 @@ Sample queries by databases
 ## regular_expression
 Sample scripts used regular expression
 
+## script_templates
+Templates to init new script
+
 ## setup_env
 Scripts to set up environment such as GitHub in new instance
