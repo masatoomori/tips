@@ -2,7 +2,7 @@
 ## Click
 ### Click Button
 ```python
-def click_btn(driver, attribute_name, btn_title):
+def click_btn(driver, btn_title, attribute_name):
     items = [tag for tag in driver.find_elements_by_tag_name('input') if tag.get_attribute(attribute_name) == btn_title]
     if len(items) == 0:
         print('Button of which tile is {} is not found'.format(btn_title))
@@ -14,7 +14,7 @@ def click_btn(driver, attribute_name, btn_title):
 
 ### Click Image
 ```python
-def click_img(driver, attribute_name, value):
+def click_img(driver, value, attribute_name):
     items = [tag for tag in driver.find_elements_by_tag_name('img') if tag.get_attribute(attribute_name) == value]
     if len(items) == 0:
         print('Image of which {a} is {v} is not found'.format(a=attribute_name, v=value))
@@ -83,4 +83,58 @@ def select_pull_down_by_text(driver, title, text, exact_match=True):
                 option.click()
                 return True
     return False
+```
+
+## File Download
+```python
+import os
+import time
+
+SEC_TO_WAIT = 5
+
+
+def click_link(driver, link_title):
+    items = [tag for tag in driver.find_elements_by_link_text(link_title)]
+    if len(items) == 0:
+        print('Image of which title is {} is not found'.format(link_title))
+        return False
+
+    items[0].click()
+    return True
+
+
+def download_file(driver, download_link, download_path, file_starts, suffix, full_path=True):
+    # ダウンロード前の同様のファイルを取得し、新しいファイルが増えていたらダウンロード完了と見做す
+    files = [f for f in os.listdir(download_path) if f.startswith(file_starts) and f.endswith(suffix)]
+    existing_files = files
+    new_file_num = len(set(files) - set(existing_files))
+    click_link(driver, download_link)
+    # ダウンロードが完了するまで待つ
+    while new_file_num == 0:
+        files = [f for f in os.listdir(download_path) if f.startswith(file_starts) and f.endswith(suffix)]
+        new_file_num = len(set(files) - set(existing_files))
+        time.sleep(SEC_TO_WAIT)
+
+    new_file = list(set(files) - set(existing_files))[0]
+
+    if full_path:
+        return os.path.join(download_path, new_file)
+    else:
+        return new_file
+```
+
+## Window
+### Close All Windows
+```python
+def close_all_windows(driver):
+    n_trial = 100
+    while n_trial > 0:
+        try:
+            window_handle = driver.window_handles[-1]
+            driver.switch_to.window(window_handle)
+            driver.close()
+            n_trial = n_trial - 1
+        except Exception as e:
+            print(e)
+            break
 ```
