@@ -29,7 +29,7 @@ def click_img(driver, value, attribute_name):
 def click_link(driver, link_title):
     items = [tag for tag in driver.find_elements_by_link_text(link_title)]
     if len(items) == 0:
-        print('Image of which title is {} is not found'.format(link_title))
+        print('Link of which title is {} is not found'.format(link_title))
         return False
 
     items[0].click()
@@ -91,6 +91,17 @@ import os
 import time
 
 SEC_TO_WAIT = 5
+SEC_TO_TIMEOUT = 60
+
+
+def click_img(driver, value, attribute_name):
+    items = [tag for tag in driver.find_elements_by_tag_name('img') if tag.get_attribute(attribute_name) == value]
+    if len(items) == 0:
+        print('Image of which {a} is {v} is not found'.format(a=attribute_name, v=value))
+        return False
+
+    items[0].click()
+    return True
 
 
 def click_link(driver, link_title):
@@ -108,12 +119,19 @@ def download_file(driver, download_link, download_path, file_starts, suffix, ful
     files = [f for f in os.listdir(download_path) if f.startswith(file_starts) and f.endswith(suffix)]
     existing_files = files
     new_file_num = len(set(files) - set(existing_files))
-    click_link(driver, download_link)
+
+    if download_link['type'] == 'img':
+        click_img(driver, download_link['val'], download_link['attr'])
+    elif download_link['type'] == 'link':
+        click_link(driver, download_link['val'])
+
     # ダウンロードが完了するまで待つ
-    while new_file_num == 0:
+    time_elapsed = 0
+    while new_file_num == 0 and time_elapsed < SEC_TO_TIMEOUT:
         files = [f for f in os.listdir(download_path) if f.startswith(file_starts) and f.endswith(suffix)]
         new_file_num = len(set(files) - set(existing_files))
         time.sleep(SEC_TO_WAIT)
+        time_elapsed = time_elapsed + SEC_TO_WAIT
 
     new_file = list(set(files) - set(existing_files))[0]
 
