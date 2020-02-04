@@ -17,3 +17,10 @@ def strip(x):
 
     return x
 ```
+
+
+### 数値を抜き出す
+```python
+NUM_PATTERN = r'([+-]?[0-9]+\.?[0-9]*)'
+n = ''.join(re.findall(NUM_PATTERN, str(s)))
+```
