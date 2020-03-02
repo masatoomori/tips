@@ -10,6 +10,13 @@ print(str_with_iso_format_date, m.group('day'))
 ```
 
 
+### 数値を抜き出す
+```python
+NUM_PATTERN = r'([+-]?[0-9]+\.?[0-9]*)'
+n = ''.join(re.findall(NUM_PATTERN, str(s)))
+```
+
+
 ### 改行、タブを削除しtsv形式で保存できるようにする
 ```python
 def strip(x):
@@ -19,8 +26,7 @@ def strip(x):
 ```
 
 
-### 数値を抜き出す
+### 改行などの特殊文字を除く
 ```python
-NUM_PATTERN = r'([+-]?[0-9]+\.?[0-9]*)'
-n = ''.join(re.findall(NUM_PATTERN, str(s)))
+new_string = '_'.join(re.findall(r"[0-9a-zA-Zあ-んア-ン一-鿐]+", old_string))
 ```
