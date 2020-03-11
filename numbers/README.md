@@ -17,7 +17,9 @@ df[range_col] = pd.cut(df[value_col], bins=bins, labels=labels, right=False).ast
 df[range_col] = df[range_col].apply(lambda x: x if x != 'nan' else '{i}: {b}+'.format(i=len(bins), b=bins[-1]))
 ```
 
-| # | <value> | <range> |
+実行結果
+
+| # |\<value\>|\<range\>|
 |---|---------|---------|
 | 0 | 1       | 1: ~0   |
 | 1 | 40      | 3: ~100 |
