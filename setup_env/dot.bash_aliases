@@ -12,3 +12,5 @@ alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
 
+# $ pip3 install jupyter
+alias jn='jupyter notebook'
