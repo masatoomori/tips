@@ -30,3 +30,9 @@ def strip(x):
 ```python
 new_string = '_'.join(re.findall(r"[0-9a-zA-Zあ-んア-ン一-鿐]+", old_string))
 ```
+
+
+### クオートで囲まれた文字列を抜き出す
+```python
+m = re.findall(r"'(.+)'", string)
+```
