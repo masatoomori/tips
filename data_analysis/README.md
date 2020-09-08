@@ -42,3 +42,44 @@ df[range_col] = df[range_col].apply(lambda x: x if x != 'nan' else '{i}: {b}+'.f
 ## Web Access Log Analysis
 
 [urllib](../web/urllib/README.md)
+
+### 人間にやさしい表記
+
+```python
+def human_friendly_format(x, round_digit):
+    """
+    x (float)を人間が読みやすいように文字列にする。
+    round_digitまで丸める。
+    絶対値が1未満の値はそのまま返す
+    """
+    negative = -1 if x < 0 else 1
+    abs_x = abs(x)
+    if abs_x < 1:
+        return x
+
+    # 整数部分の桁数を取得する
+    int_digit = len(re.split('\.', str(abs_x))[0])
+
+    # 最高位が1の位になるように調整する
+    abs_x_1 = abs_x / 10 ** (int_digit - 1)
+
+    # 数値を丸める
+    abs_x_1_round = round(abs_x_1, round_digit - 1)
+
+    # 桁を元に戻す
+    abs_x_round = abs_x_1_round * 10 ** (int_digit - 1)
+
+    for d, n in {12: '兆', 8: '億', 4: '万'}.items():
+        if int_digit > d:
+            result = negative * abs_x_round / 10 ** d
+
+            # 整数で表せる場合は整数にする
+            result = int(result) if result == int(result) else result
+
+            return '{x}{n}'.format(x=result, n=n)
+
+    # 整数で表せる場合は整数にする
+    abs_x_round = int(abs_x_round) if abs_x_round == int(abs_x_round) else abs_x_round
+
+    return abs_x_round * negative
+```
