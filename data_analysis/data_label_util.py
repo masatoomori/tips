@@ -45,7 +45,7 @@ def bin_col(s_values, bin_range, null_value=-1, unit_name='', human_friendly=Fal
     """DataFrameの対象数値が入ったカラムをレンジにグルーピングする
 
     Args:
-        valuse (pd.series): レンジにカテゴライズする値のシリーズ
+        s_valuse (pd.series): レンジにカテゴライズする値のシリーズ
         bin_range (sorted list of int/ float): レンジ
         null_value (int/ float): 欠測値に入れる値
         unit_name (str, optional): Defaults to ''. レンジに入れる単位
@@ -54,8 +54,8 @@ def bin_col(s_values, bin_range, null_value=-1, unit_name='', human_friendly=Fal
         lang (str, optional): Defaults to 'en'. ['en', 'ja']のどちらか。無効の値の場合は'en'
     """
 
-    s_values = pd.to_numeric((s_values)).fillna(null_value)
-    bin_range.append(s_values.min())
+    _s_values = pd.to_numeric((s_values)).fillna(null_value)
+    bin_range.append(_s_values.min())
     bins = sorted(list(set(bin_range)))
 
     prefix = '~'
@@ -70,7 +70,7 @@ def bin_col(s_values, bin_range, null_value=-1, unit_name='', human_friendly=Fal
         labels = ['{i}: {p}{b}{u}{s}'.format(i=i+1, p=prefix,
                                              b=human_friendly_format(b, round_digit),
                                              u=unit_name, s=suffix) for i, b in enumerate(bins[1:])]
-        s_range = pd.cut(s_values, bins=bins, labels=labels, right=False).astype(str)
+        s_range = pd.cut(_s_values, bins=bins, labels=labels, right=False).astype(str)
         s_range = s_range.apply(lambda x: x if x != 'nan' else '{i}: {b}{u}{s}'.format(i=len(bins),
                                                                                        b=human_friendly_format(bins[-1], round_digit),
                                                                                        u=unit_name, s=suffix_last))
@@ -78,7 +78,7 @@ def bin_col(s_values, bin_range, null_value=-1, unit_name='', human_friendly=Fal
         labels = ['{i}: {p}{b}{u}{s}'.format(i=i+1, p=prefix,
                                              b=b,
                                              u=unit_name, s=suffix) for i, b in enumerate(bins[1:])]
-        s_range = pd.cut(s_values, bins=bins, labels=labels, right=False).astype(str)
+        s_range = pd.cut(_s_values, bins=bins, labels=labels, right=False).astype(str)
         s_range = s_range.apply(lambda x: x if x != 'nan' else '{i}: {b}{u}{s}'.format(i=len(bins),
                                                                                        b=bins[-1],
                                                                                        u=unit_name, s=suffix_last))
