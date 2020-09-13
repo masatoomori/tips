@@ -1,4 +1,7 @@
-### ISOフォーマットの日付を含む文字列から日付を取り出す
+# 正規表現
+
+## ISOフォーマットの日付を含む文字列から日付を取り出す
+
 ```python
 import re
 
@@ -9,15 +12,15 @@ print(str_with_iso_format_date, m.group('month'))
 print(str_with_iso_format_date, m.group('day'))
 ```
 
+## 数値を抜き出す
 
-### 数値を抜き出す
 ```python
 NUM_PATTERN = r'([+-]?[0-9]+\.?[0-9]*)'
 n = ''.join(re.findall(NUM_PATTERN, str(s)))
 ```
 
+## 改行、タブを削除しtsv形式で保存できるようにする
 
-### 改行、タブを削除しtsv形式で保存できるようにする
 ```python
 def strip(x):
     x = str(x).replace('\n', '').replace('\r', '').replace('\t', ' ')
@@ -25,14 +28,14 @@ def strip(x):
     return x
 ```
 
+## 改行などの特殊文字を除く
 
-### 改行などの特殊文字を除く
 ```python
 new_string = '_'.join(re.findall(r"[0-9a-zA-Zあ-んア-ン一-鿐]+", old_string))
 ```
 
+## クオートで囲まれた文字列を抜き出す
 
-### クオートで囲まれた文字列を抜き出す
 ```python
 m = re.findall(r"'(.+)'", string)
 ```
