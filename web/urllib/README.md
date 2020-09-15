@@ -12,4 +12,11 @@ def parse_params(df):
         df['param_{}'.format(p)] = df['params'].apply(lambda x: x[p] if p in x else None)
 
     return df
+
+
+def extract_path_body(df):
+    # Pathのメインの部分を抜き出す
+    df['ga_pagePath_body'] = df['ga_pagePath'].fillna('').apply(lambda x: urllib.parse.urlparse(x)[2])      # 2: path
+
+    return df
 ```
