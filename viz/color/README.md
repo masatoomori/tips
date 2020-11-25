@@ -42,7 +42,7 @@ def main():
     x = np.linspace(0, np.pi * 4, 100)
     dx = np.pi / (nsinx)
     sinxes = [np.sin(x - i * dx) for i in range(nsinx)]
-    gra = gradation(start="#CCCCCC", end="#00519A", step=nsinx)
+    gra = color_gradation(start="#CCCCCC", end="#00519A", step=nsinx)
     for i, sinx in enumerate(sinxes):
         plt.plot(x, sinx, label=f"dx*{i}", lw=3, color=gra[i])
     plt.legend()
