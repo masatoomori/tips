@@ -1,5 +1,21 @@
 # Data Analysis
 
+## DataFrame
+
+### マルチカラムの解除
+
+```python
+import pandas as pd
+
+df_data = pd.DataFrame({'index': ['a', 'b', 'c', 'a'],
+                        'column': ['x', 'y', 'x', 'y'],
+                        'value': [2, 3, 5, 6]})
+
+
+df = df_data.groupby(['index', 'column']).sum().unstack()
+df.columns = df.columns.levels[1]
+```
+
 ## 数値分析
 
 ### Binning
