@@ -16,6 +16,22 @@ df = df_data.groupby(['index', 'column']).sum().unstack()
 df.columns = df.columns.levels[1]
 ```
 
+
+## List
+
+### 二次元リストの一次元化
+
+sum()の第一引数に二次元リスト、第二引数に空リストを入れると一次元リストになる
+https://note.nkmk.me/python-list-flatten/
+
+```python
+l_2d = [[0, 1], [2, 3]]
+print(sum(l_2d, []))
+
+# [0, 1, 2, 3]
+```
+
+
 ## 数値分析
 
 ### Binning

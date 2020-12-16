@@ -40,3 +40,32 @@ alt.Chart(df).transform_stack(
     stroke=alt.value('black'),
 ).configure_axis( grid=False )
 ```
+
+# データの連動
+
+```python
+import altair as alt
+from vega_datasets import data
+
+cars = data.cars()
+
+brush = alt.selection_interval()
+
+points = alt.Chart(cars).mark_point().encode(
+    x='Horsepower:Q',
+    y='Miles_per_Gallon:Q',
+    color=alt.condition(brush, 'Origin:N', alt.value('lightgray'))
+).add_selection(
+    brush
+)
+
+bars = alt.Chart(cars).mark_bar().encode(
+    y='Origin:N',
+    color='Origin:N',
+    x='count(Origin):Q'
+).transform_filter(
+    brush
+)
+
+points & bars
+```
