@@ -39,7 +39,7 @@ import pandas as pd
 
 df = pd.DataFrame()
 
-boxplot = alt.Chart(df).mark_boxplot(ticks=alt.MarkConfig(),median=alt.MarkConfig(color='black')).encode(
+boxplot = alt.Chart(df).mark_boxplot(ticks=alt.MarkConfig(color='black'), median=alt.MarkConfig(color='black')).encode(
   x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
   y=alt.Y('mean(<y axis>):Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
   # column=alt.Column('<col split>', sort=<list for col order>, header=alt.Header(labelFontSize=11, labelAngle=0, titleFontSize=11)),
