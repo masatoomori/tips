@@ -71,7 +71,7 @@ import pandas as pd
 df = pd.DataFrame()
 point = alt.Chart(df).mark_point().encode(
     x=alt.X('<x axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
-    y=alt.Y('<y axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='在宅勤務月当たり日数', labelAngle=0)),
+    y=alt.Y('<y axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
     size=alt.Size('sum(<value for size>):Q', scale=alt.Scale()),
     color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud, sort=['<sort list>'])
 )
