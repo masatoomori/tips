@@ -31,6 +31,52 @@ strokeWidth=0               # 境界線の幅
 
 ## Charts
 
+### Bar
+
+```python
+import altair as alt
+import pandas as pd
+
+df = pd.DataFrame()
+bar = alt.Chart(df_).mark_bar().encode(
+    x=alt.X('<x axis>:N'),
+    y=alt.Y('<y axis>:Q'),
+    color=alt.Color('<color category>:N', sort=alt.EncodingSortField(field="<y axis>", op="sum", order='descending'))    # カテゴリは<y axis>の合計が大きい順に並べる
+)
+```
+
+### Histogram
+
+```python
+import altair as alt
+import pandas as pd
+
+df = pd.DataFrame()
+bin_min = 'lower bottom of bin'
+bin_max = 'upper bottom of bin'
+bin_step = 'width of bin step'
+
+hist = alt.Chart(df).mark_bar().encode(
+    x=alt.X('<x axis>:Q', bin=alt.Bin(extent=[bin_min, bin_max], step=bin_step)),
+    y='count()',
+)
+```
+
+### Scatter Chart
+
+```python
+import altair as alt
+import pandas as pd
+
+df = pd.DataFrame()
+point = alt.Chart(df).mark_point().encode(
+    x=alt.X('<x axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
+    y=alt.Y('<y axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='在宅勤務月当たり日数', labelAngle=0)),
+    size=alt.Size('sum(<value for size>):Q', scale=alt.Scale()),
+    color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud, sort=['<sort list>'])
+)
+```
+
 ### Boxplot
 
 ```python
@@ -40,11 +86,11 @@ import pandas as pd
 df = pd.DataFrame()
 
 boxplot = alt.Chart(df).mark_boxplot(ticks=alt.MarkConfig(color='black'), median=alt.MarkConfig(color='black')).encode(
-  x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
-  y=alt.Y('mean(<y axis>):Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
-  # column=alt.Column('<col split>', sort=<list for col order>, header=alt.Header(labelFontSize=11, labelAngle=0, titleFontSize=11)),
-  # row=alt.Row('<row split>', sort=<list for row order>, header=alt.Header(labelFontSize=11, labelAngle=-90, titleFontSize=11)),
-  color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud)
+    x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
+    y=alt.Y('mean(<y axis>):Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
+    # column=alt.Column('<col split>', sort=<list for col order>, header=alt.Header(labelFontSize=11, labelAngle=0, titleFontSize=11)),
+    # row=alt.Row('<row split>', sort=<list for row order>, header=alt.Header(labelFontSize=11, labelAngle=-90, titleFontSize=11)),
+    color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud)
 )
 ```
 
@@ -57,9 +103,9 @@ import pandas as pd
 df = pd.DataFrame()
 
 rect = alt.Chart(df).mark_rect().encode(
-  x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
-  y=alt.Y('<y axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
-  color=alt.Color('count()', scale = alt.Scale(range=scale_color_cud))
+    x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
+    y=alt.Y('<y axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
+    color=alt.Color('count()', scale=alt.Scale(range=scale_color_cud))
 )
 ```
 
@@ -117,12 +163,12 @@ import pandas as pd
 df = pd.DataFrame()
 
 rect = alt.Chart(df).transform_fold(
-  ['<縦に結合するカラムのリスト>'],
-  as_=['<上記カラム名を入れておく変数名>', '<上記カラムの値を格納する変数名>']
+    ['<縦に結合するカラムのリスト>'],
+    as_=['<上記カラム名を入れておく変数名>', '<上記カラムの値を格納する変数名>']
 ).mark_rect().encode(
-  x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
-  y=alt.Y('{}:N'.format('<上記カラム名を入れておく変数名>')),
-  color=alt.Color('sum(<上記カラムの値を格納する変数名>):Q', scale=alt.Scale(range=scale_color_cud))
+    x=alt.X('<x axis>:N', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
+    y=alt.Y('{}:N'.format('<上記カラム名を入れておく変数名>')),
+    color=alt.Color('sum(<上記カラムの値を格納する変数名>):Q', scale=alt.Scale(range=scale_color_cud))
 )
 ```
 
@@ -153,4 +199,10 @@ bars = alt.Chart(cars).mark_bar().encode(
 )
 
 points & bars
+```
+
+## 描写
+
+```python
+chart.properties(height=400, width=400).interactive()
 ```
