@@ -58,11 +58,21 @@ df = pd.DataFrame()
 hue_col = '<hue col>'
 hue_sorted_list = ['list to sort hue']
 
+sorted_x_axis_list = ['items for x axis']
+total_for_x_axis = '<total col name for x axis>'
+
+# 積み上げの順序を指定したい場合
 temp_col_for_sort = str(hash('{}'.format(''.join(df.columns))))     # 何でもいいので他と被らないテンポラリのカラムを作る
 df[temp_col_for_sort] = df[hue_col].apply(lambda x: hue_sorted_list.index(x))
 
+# 横軸に全体を付けたしたい場合（normalize のときのみ推奨）
+if sorted_x_axis_list:
+    sorted_x_axis_list = [total_for_x_axis] + sorted_x_axis_list
+else:
+    sorted_x_axis_list = alt.EncodingSortField(field='<y axis>', op="sum", order='descending')
+
 bar = alt.Chart(df).mark_bar().encode(
-    x=alt.X('<x axis>:N', sort=alt.EncodingSortField(field=hue_col, op="sum", order='descending')),
+    x=alt.X('<x axis>:N', sort=sorted_x_axis_list),
     y=alt.Y('<y axis>:Q', axis=alt.Axis(format='%'), stack='normalize'),
     color=alt.Color('{}:N'.format(hue_col), scale=scale_color_cud, sort=hue_sorted_list),
     order='{}'.format(temp_col_for_sort)
