@@ -38,11 +38,37 @@ import altair as alt
 import pandas as pd
 
 df = pd.DataFrame()
-bar = alt.Chart(df_).mark_bar().encode(
+y_axis_min = '<>'
+y_axis_max = '<>'
+
+bar = alt.Chart(df).mark_bar().encode(
     x=alt.X('<x axis>:N'),
-    y=alt.Y('<y axis>:Q'),
+    y=alt.Y('<y axis>:Q', scale=alt.Scale(domain=[y_axis_min, y_axis_max])),
     color=alt.Color('<color category>:N', sort=alt.EncodingSortField(field="<y axis>", op="sum", order='descending'))    # カテゴリは<y axis>の合計が大きい順に並べる
 )
+```
+
+### Stacked Bar
+
+```python
+import altair as alt
+import pandas as pd
+
+df = pd.DataFrame()
+hue_col = '<hue col>'
+hue_sorted_list = ['list to sort hue']
+
+temp_col_for_sort = str(hash('{}'.format(''.join(df.columns))))     # 何でもいいので他と被らないテンポラリのカラムを作る
+df[temp_col_for_sort] = df[hue_col].apply(lambda x: hue_sorted_list.index(x))
+
+bar = alt.Chart(df).mark_bar().encode(
+    x=alt.X('<x axis>:N', sort=alt.EncodingSortField(field=hue_col, op="sum", order='descending')),
+    y=alt.Y('<y axis>:Q', axis=alt.Axis(format='%'), stack='normalize'),
+    color=alt.Color('{}:N'.format(hue_col), scale=scale_color_cud, sort=hue_sorted_list),
+    order='{}'.format(temp_col_for_sort)
+)
+
+df.drop([temp_col_for_sort], axis=1, inplace=True)
 ```
 
 ### Histogram
@@ -206,3 +232,7 @@ points & bars
 ```python
 chart.properties(height=400, width=400).interactive()
 ```
+
+## Useful Links
+
+[Bar Chart Examples](https://colab.research.google.com/github/altair-viz/altair_notebooks/blob/master/notebooks/04-BarCharts.ipynb)
