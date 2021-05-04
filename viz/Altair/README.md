@@ -1,6 +1,31 @@
 # Altair 備忘録
 
-## 設定
+## 環境設定
+
+### インストール
+
+```shell
+$ pip install -U altair vega_datasets notebook vega
+```
+
+### テストスクリプト
+```python
+import altair as alt
+from vega_datasets import data
+
+# for the notebook only (not for JupyterLab) run this command once per session
+alt.renderers.enable('notebook')
+
+iris = data.iris()
+
+alt.Chart(iris).mark_point().encode(
+    x='petalLength',
+    y='petalWidth',
+    color='species'
+)
+```
+
+## 描写設定
 
 ### 初期設定
 
@@ -38,12 +63,14 @@ import altair as alt
 import pandas as pd
 
 df = pd.DataFrame()
-y_axis_min = '<>'
-y_axis_max = '<>'
+x_axis = '<column name>'
+y_axis = '<column name>'
+y_axis_min = int
+y_axis_max = int
 
 bar = alt.Chart(df).mark_bar().encode(
-    x=alt.X('<x axis>:N'),
-    y=alt.Y('<y axis>:Q', scale=alt.Scale(domain=[y_axis_min, y_axis_max])),
+    x=alt.X('{}:N'.format(x_axis)),
+    y=alt.Y('{}:Q'.format(y_axis), scale=alt.Scale(domain=[y_axis_min, y_axis_max])),
     color=alt.Color('<color category>:N', sort=alt.EncodingSortField(field="<y axis>", op="sum", order='descending'))    # カテゴリは<y axis>の合計が大きい順に並べる
 )
 ```
@@ -88,13 +115,17 @@ import altair as alt
 import pandas as pd
 
 df = pd.DataFrame()
-bin_min = 'lower bottom of bin'
-bin_max = 'upper bottom of bin'
-bin_step = 'width of bin step'
+x_axis = 'column name'
+y_axis = 'count()'
+hue_col = 'column name'
+bin_min = float
+bin_max = float
+bin_step = float
 
 hist = alt.Chart(df).mark_bar().encode(
-    x=alt.X('<x axis>:Q', bin=alt.Bin(extent=[bin_min, bin_max], step=bin_step)),
-    y='count()',
+    x=alt.X('{}:Q'.format(x_axis), bin=alt.Bin(extent=[bin_min, bin_max], step=bin_step)),
+    y=alt.Y('{}:Q'.format(y_axis)),
+    color=alt.Color('{}:N'.format(hue_col)),
 )
 ```
 
