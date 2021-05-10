@@ -8,29 +8,18 @@
 $ pip install -U altair vega_datasets notebook vega
 ```
 
-### テストスクリプト
-```python
-import altair as alt
-from vega_datasets import data
-
-# for the notebook only (not for JupyterLab) run this command once per session
-alt.renderers.enable('notebook')
-
-iris = data.iris()
-
-alt.Chart(iris).mark_point().encode(
-    x='petalLength',
-    y='petalWidth',
-    color='species'
-)
-```
-
 ## 描写設定
 
 ### 初期設定
 
 ```python
 import altair as alt
+
+# for the notebook only (not for JupyterLab) run this command once per session
+alt.renderers.enable('notebook')
+
+# Optional in JupyterLab: requires an up-to-date vega labextension.
+alt.renderers.enable('mimetype')
 
 # 上限エラー無効化
 alt.data_transformers.enable('default', max_rows=None)
@@ -62,16 +51,24 @@ strokeWidth=0               # 境界線の幅
 import altair as alt
 import pandas as pd
 
-df = pd.DataFrame()
-x_axis = '<column name>'
-y_axis = '<column name>'
-y_axis_min = int
-y_axis_max = int
+df_orig = pd.DataFrame()
+x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
+y_axis = {'name': '<column name>', 'type': 'Q', 'op': 'sum'}
+hue = {'name': 'page_category', 'type': 'N', 'sort_col': 'pv_count', 'sort_ascending': False}
 
-bar = alt.Chart(df).mark_bar().encode(
-    x=alt.X('{}:N'.format(x_axis)),
-    y=alt.Y('{}:Q'.format(y_axis), scale=alt.Scale(domain=[y_axis_min, y_axis_max])),
-    color=alt.Color('<color category>:N', sort=alt.EncodingSortField(field="<y axis>", op="sum", order='descending'))    # カテゴリは<y axis>の合計が大きい順に並べる
+df_ = df_orig[[x_axis['name'], y_axis['name'], hue['name']]].copy()
+
+y_ = y_axis['name']
+if 'op' in y_axis:
+    y_ = y_axis['op'] + '(' + y_ + ')'
+
+hue_sort_list = df_orig[[hue['name'], hue['sort_col']]].groupby(hue['name']).count().sort_values(by=hue['sort_col'], ascending=hue['sort_ascending']).index.tolist()
+    
+chart = alt.Chart(df_).mark_bar().encode(
+    x=alt.X('{n}:{t}'.format(n=hue['name'], t=hue['type']),
+            sort=alt.EncodingSortField(field=y_axis['name'], op="sum", order='descending')),
+    y=alt.Y(y_),
+    color=alt.Color('{n}:{t}'.format(n=hue['name'], t=hue['type'])),
 )
 ```
 
