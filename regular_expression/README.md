@@ -31,7 +31,7 @@ def strip(x):
 ## 改行などの特殊文字を除く
 
 ```python
-new_string = '_'.join(re.findall(r"[0-9a-zA-Zあ-んア-ン一-鿐]+", old_string))
+new_string = '_'.join(re.findall(r"[0-9a-zA-Zあ-んア-ン一-鿐々]+", old_string))
 ```
 
 ## クオートで囲まれた文字列を抜き出す
