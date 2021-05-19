@@ -13,7 +13,27 @@ df_data = pd.DataFrame({'index': ['a', 'b', 'c', 'a'],
 
 
 df = df_data.groupby(['index', 'column']).sum().unstack()
+
+# 最下レイヤの値のみを採用する場合
 df.columns = df.columns.levels[1]
+
+
+# 全レイヤをつなげる場合
+def flatten_multi_columns(df_, *, to_snake_case=True, reverse_layer=False):
+  new_col_items = df_.columns.values
+  if to_snake_case:
+    if reverse_layer:
+      return ['_'.join(reversed(items)) for items in new_col_items]
+    else:
+      return ['_'.join(items) for items in new_col_items]
+  else:
+    if reverse_layer:
+      return [''.join(reversed([item.capitalize() for item in items])) for items in new_col_items]
+    else:
+      return [''.join([item.capitalize() for item in items]) for items in new_col_items]
+
+
+df.columns = flattern_multi_columns(df)
 ```
 
 
