@@ -54,7 +54,7 @@ import pandas as pd
 df_orig = pd.DataFrame()
 x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
 y_axis = {'name': '<column name>', 'type': 'Q', 'op': 'sum'}
-hue = {'name': 'page_category', 'type': 'N', 'sort_col': 'pv_count', 'sort_ascending': False}
+hue = {'name': '<column name>', 'type': 'N', 'sort_col': '<column name>', 'sort_ascending': False}
 
 df_ = df_orig[[x_axis['name'], y_axis['name'], hue['name']]].copy()
 
@@ -126,18 +126,43 @@ hist = alt.Chart(df).mark_bar().encode(
 )
 ```
 
-### Scatter Chart
+### Bubble Chart
 
 ```python
 import altair as alt
 import pandas as pd
 
+x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
+y_axis = {'name': '<column name>', 'type': 'Q'}
+color = {'name': '<column name>', 'type': 'N'}
+
 df = pd.DataFrame()
-point = alt.Chart(df).mark_point().encode(
-    x=alt.X('<x axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<x axis name>', labelAngle=0)),
-    y=alt.Y('<y axis>:Q', axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title='<y axis name>', labelAngle=0)),
+bubble = alt.Chart(df).mark_point().encode(
+    x=alt.X('{n}:{t}'.format(n=x_axis['name'], t=x_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=x_axis['name'], labelAngle=0)),
+    y=alt.Y('{n}:{t}'.format(n=y_axis['name'], t=y_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=y_axis['name'], labelAngle=0)),
     size=alt.Size('sum(<value for size>):Q', scale=alt.Scale()),
-    color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud, sort=['<sort list>'])
+    color=alt.Color('<hue>:N', legend=None, scale=scale_color_cud, sort=['<sort list>']),
+    tooltip=['<column name>', ...]
+)
+```
+
+### Scatter Chart
+
+```python
+
+import altair as alt
+import pandas as pd
+
+x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
+y_axis = {'name': '<column name>', 'type': 'Q'}
+color = {'name': '<column name>', 'type': 'N'}
+
+df = pd.DataFrame()
+point = alt.Chart(df).mark_circle(size=20).encode(
+    x=alt.X('{n}:{t}'.format(n=x_axis['name'], t=x_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=x_axis['name'], labelAngle=0)),
+    y=alt.Y('{n}:{t}'.format(n=y_axis['name'], t=y_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=y_axis['name'], labelAngle=0)),
+    color=alt.Color('{n}:{t}'.format(n=color['name'], t=color['type'])),
+    tooltip=[x_axis['name'], y_axis['name'], color['name']]
 )
 ```
 
