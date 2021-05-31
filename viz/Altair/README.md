@@ -112,17 +112,19 @@ import altair as alt
 import pandas as pd
 
 df = pd.DataFrame()
-x_axis = 'column name'
-y_axis = 'count()'
-hue_col = 'column name'
+x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
+y_axis = {'name': 'count()', 'type': 'Q'}
+hue = {'name': '<column name>', 'type': 'N'}
 bin_min = float
 bin_max = float
 bin_step = float
 
-hist = alt.Chart(df).mark_bar().encode(
-    x=alt.X('{}:Q'.format(x_axis), bin=alt.Bin(extent=[bin_min, bin_max], step=bin_step)),
-    y=alt.Y('{}:Q'.format(y_axis)),
-    color=alt.Color('{}:N'.format(hue_col)),
+df_ = df[[x_axis['name'], hue['name']]].copy()
+
+hist = alt.Chart(df_).mark_bar().encode(
+    x=alt.X('{n}:{t}'.format(n=x_axis['name'], t=x_axis['type']), bin=alt.Bin(extent=[bin_min, bin_max], step=bin_step)),
+    y=alt.Y('{n}:{t}'.format(n=y_axis['name'], t=y_axis['type'])),
+    color=alt.Color('{n}:{t}'.format(n=hue['name'], t=hue['type']))
 )
 ```
 
@@ -156,13 +158,16 @@ import pandas as pd
 x_axis = {'name': '<column name>', 'type': 'Q'}         # 時系列の場合は 'type': 'T'、カテゴリの場合は 'type': 'N'
 y_axis = {'name': '<column name>', 'type': 'Q'}
 color = {'name': '<column name>', 'type': 'N'}
+other_cols_on_tooltip = '<list of columns to show as tooltip>'
 
 df = pd.DataFrame()
+df_ = df[[x_axis['name'], y_axis['name'], color['name']] + other_cols_on_tooltip].copy()
+
 point = alt.Chart(df).mark_circle(size=20).encode(
     x=alt.X('{n}:{t}'.format(n=x_axis['name'], t=x_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=x_axis['name'], labelAngle=0)),
     y=alt.Y('{n}:{t}'.format(n=y_axis['name'], t=y_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=y_axis['name'], labelAngle=0)),
     color=alt.Color('{n}:{t}'.format(n=color['name'], t=color['type'])),
-    tooltip=[x_axis['name'], y_axis['name'], color['name']]
+    tooltip=other_cols_on_tooltip + [[x_axis['name'], y_axis['name'], color['name']]
 )
 ```
 
