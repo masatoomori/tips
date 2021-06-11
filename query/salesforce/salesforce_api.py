@@ -11,7 +11,7 @@ CRED_FILE = 'salesforce_api_cred.json'
 def load_cred(cred_paths, cred_file, env) -> dict:
     for path in cred_paths:
         if os.path.exists(os.path.join(path, cred_file)):
-            cred_file_full = os.path.join(path,cred_file)
+            cred_file_full = os.path.join(path, cred_file)
             cred = json.load(open(cred_file_full, 'r'))
             if env in cred:
                 print('profile: {e} found in {f}'.format(e=env, f=cred_file_full))
