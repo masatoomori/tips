@@ -2,6 +2,23 @@
 
 ## DataFrame
 
+### オーバーフローした日時の修正
+
+上限の日付の年だったらその年の1月1日に変更する
+
+```python
+import datetime
+import pandas as pd
+
+
+def fix_overflow_datetime(x):
+    if x != x:
+        return x
+    if int(str(x)[:4]) >= pd.Timestamp.max.year:
+        return datetime.datetime(year=pd.Timestamp.max.year, month=1, day=1)
+    return x
+```
+
 ### マルチカラムの解除
 
 ```python
@@ -33,16 +50,15 @@ def flatten_multi_columns(df_, *, to_snake_case=True, reverse_layer=False):
       return [''.join([item.capitalize() for item in items]) for items in new_col_items]
 
 
-df.columns = flattern_multi_columns(df)
+df.columns = flatten_multi_columns(df)
 ```
-
 
 ## List
 
 ### 二次元リストの一次元化
 
-sum()の第一引数に二次元リスト、第二引数に空リストを入れると一次元リストになる
-https://note.nkmk.me/python-list-flatten/
+sum()の第一引数に二次元リスト、第二引数に空リストを入れると一次元リストになる。
+[参考](https://note.nkmk.me/python-list-flatten/)
 
 ```python
 l_2d = [[0, 1], [2, 3]]
@@ -50,7 +66,6 @@ print(sum(l_2d, []))
 
 # [0, 1, 2, 3]
 ```
-
 
 ## 数値分析
 
