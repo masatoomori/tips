@@ -35,7 +35,7 @@ df = df_data.groupby(['index', 'column']).sum().unstack()
 df.columns = df.columns.levels[1]
 
 
-# 全レイヤをつなげる場合
+# 全レイヤをつなげる場合 1
 def flatten_multi_columns(df_, *, to_snake_case=True, reverse_layer=False):
   new_col_items = df_.columns.values
   if to_snake_case:
@@ -51,6 +51,9 @@ def flatten_multi_columns(df_, *, to_snake_case=True, reverse_layer=False):
 
 
 df.columns = flatten_multi_columns(df)
+
+# 全レイヤをつなげる場合 2
+df.columns = ["_".join(c) for c in df.columns.to_flat_index()]
 ```
 
 ## List
