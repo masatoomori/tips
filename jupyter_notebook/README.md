@@ -33,7 +33,7 @@ $("#code-show-switch-btn").click(switch_display_setting);
 %%HTML
 <style>
     div#notebook-container    { width: 95%; }
-    div#menubar-container     { width:95%; }
+    div#menubar-container     { width: 95%; }
     div#maintoolbar-container { width: 95%; }
 </style>
 ```
