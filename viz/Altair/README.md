@@ -167,7 +167,7 @@ point = alt.Chart(df).mark_circle(size=20).encode(
     x=alt.X('{n}:{t}'.format(n=x_axis['name'], t=x_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=x_axis['name'], labelAngle=0)),
     y=alt.Y('{n}:{t}'.format(n=y_axis['name'], t=y_axis['type']), axis=alt.Axis(labelFontSize=11, ticks=True, titleFontSize=11, title=y_axis['name'], labelAngle=0)),
     color=alt.Color('{n}:{t}'.format(n=color['name'], t=color['type'])),
-    tooltip=other_cols_on_tooltip + [[x_axis['name'], y_axis['name'], color['name']]
+    tooltip=other_cols_on_tooltip + [[x_axis['name'], y_axis['name'], color['name']]]
 )
 ```
 
