@@ -18,13 +18,13 @@ def color_gradation(start="#CCCCCC", end="#00519A", step=5):
   from colorsys import rgb_to_hls, hls_to_rgb
   if len(start) != 7 or len(end) != 7:
     raise Exception(f"argument length must be 7: now{len(start)}, {len(end)}")
-  
+
   rgb_s = (int(start[i:i + 2], 16) / 256 for i in range(1, 4))
   rgb_e = (int(end[i:i + 2], 16) / 256 for i in range(1, 4))
   hls_s = np.array(rgb_to_hls(*rgb_s))
   hls_e = np.array(rgb_to_hls(*rgb_e))
   diff_hls = hls_e - hls_s
-  
+
   # color is circle
   diff_hls[0] = (diff_hls[0] + 0.5) - np.floor(diff_hls[0] + 0.5) - 0.5
   hls_list = [hls_s + diff_hls * i / step for i in range(step)]
