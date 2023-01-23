@@ -1,3 +1,13 @@
+## AWS セッションを開始する
+
+```python
+import boto3
+
+profile_name = '~/.aws/cofing に記した名前'
+
+boto3.setup_default_session(profile_name=profile_name)
+```
+
 ## スクリプトを非表示にする
 
 ```python
