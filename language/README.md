@@ -13,26 +13,6 @@ message = 'string with illegal characters'
 print(message.encode('cp932', errors='ignore').decode('cp932'))
 ```
 
-### Path
-
-#### Path をディレクトリごとに分解してリストにする
-
-```python
-def parse_path(path):
-    path_items = list()
-    while True:
-        path, item = os.path.split(path)
-
-        if item:
-            path_items.append(item)
-        elif path:
-            path_items.append(path)
-            break
-
-    path_items.reverse()
-    return path_items
-```
-
 ## Console
 
 ### terminal on Mac
